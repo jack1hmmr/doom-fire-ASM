@@ -17,7 +17,7 @@ main:
     mov r12, rax
 
     ; Keep window open for now
-    mov edi, 100
+    mov edi, 100000
     call SDL_Delay
 
     ; get rid window
