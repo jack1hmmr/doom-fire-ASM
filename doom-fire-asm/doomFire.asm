@@ -55,7 +55,7 @@ gradient_end:
 
 
 section .text
-global fire_update:
+fire_update:
     mov eax, 472
 
     xor edx, edx
@@ -82,32 +82,11 @@ global fire_update:
     imul r8d, 3
     lea r8, [pixelBuffer + r8]
 
-   mov r10, 10
-
-pixel_row:
-    mov r11, 10
-
-pixel_column:
-    mov al, [rsi]
-    mov [r8], al
-
-    mov al, [rsi + 1]
-    mov [r8 + 1], al
-
-    mov al, [rsi + 2]
-    mov [r8 + 2], al
-
-    add r8, 3
-    dec r11
-    jnz pixel_column
-
-    add r8, 2970
-    dec r10
-    jnz pixel_row
+   
 
     mov rcx, 100
     mov rdi, heat + 9900
-    mov rdi, heat + 9900
+    
 
 fill_bottom:
     mov byte [rdi], 36
