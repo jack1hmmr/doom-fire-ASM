@@ -55,59 +55,28 @@ gradient_end:
 
 
 section .text
+
 fire_update:
-    mov eax, 472
-
-    xor edx, edx
-    mov ecx, 100
-    div ecx
-
-    imul eax, 10
-    imul edx, 10
-
-    ; save the screen coordinates
-    mov r8d, eax
-    mov r9d, edx
-
-    ; get the heat value
-    movzx eax, byte [heat + 472]
-
-    ; get the gradient entry
-    imul eax, 3
-    lea rsi, [gradient + eax]
-
-    ; calculate pixel-buffer offset
-    imul r8d, 1000
-    add r8d, r9d
-    imul r8d, 3
-    lea r8, [pixelBuffer + r8]
-
-    mov al, [rsi]
-    mov [r8], al
-
-    mov al, [rsi + 1]
-    mov [r8 + 1], al
-
-    mov al, [rsi + 2]
-    mov [r8 + 2], al
-   
-
+    
+    ; Seed the bottom row with maximum heat
+    
     mov rcx, 100
     mov rdi, heat + 9900
-    
 
 fill_bottom:
     mov byte [rdi], 36
     inc rdi
     loop fill_bottom
 
-    mov rcx, 100
+    
+    ; Spread heat upward
+    
     mov rsi, 9900
     mov rdi, 9800
     mov r9, 99
 
 outer_loop:
-    mov r10, 0
+    xor r10, r10
     mov rcx, 100
 
 spread_heat:
@@ -128,6 +97,7 @@ no_heat:
 cooling_done:
     mov [heat + rdi], bl
 
+    ; horizontal wrap
     cmp r10, 2
     jb wrap_left
 
@@ -142,14 +112,85 @@ spread_done:
     inc rdi
     inc r10
     loop spread_heat
-    
+
     sub rsi, 200
     sub rdi, 200
 
     dec r9
     jnz outer_loop
+
+    ; Convert the 100x100 heat grid into pixels
+    ; Each heat cell becomes a 10x10 pixel block
     
+    xor r10, r10                 ; heat row = 0
+
+draw_rows:
+    xor r11, r11                 ; heat column = 0
+
+draw_columns:
+    ; heat index = row * 100 + column
+    mov eax, r10d
+    imul eax, 100
+    add eax, r11d
+
+    ; get heat value
+    movzx eax, byte [heat + rax]
+
+    ; heat value -> RGB gradient entry
+    imul eax, 3
+    lea rsi, [gradient + eax]
+
+    ; screen Y = row * 10
+    mov eax, r10d
+    imul eax, 10
+    imul eax, 1000
+
+    ; screen X = column * 10
+    mov edx, r11d
+    imul edx, 10
+
+    add eax, edx
+    imul eax, 3
+
+    ; pixelBuffer + offset
+    lea rdi, [pixelBuffer + rax]
+
+    ; Draw this heat cell as a 10x10 block
+    
+    mov r8, 10
+
+draw_block_rows:
+    mov r9, 10
+    mov rdx, rdi
+
+draw_block_columns:
+    mov al, [rsi]
+    mov [rdx], al
+
+    mov al, [rsi + 1]
+    mov [rdx + 1], al
+
+    mov al, [rsi + 2]
+    mov [rdx + 2], al
+
+    add rdx, 3
+    dec r9
+    jnz draw_block_columns
+
+    add rdi, 3000
+    dec r8
+    jnz draw_block_rows
+
+    inc r11
+    cmp r11, 100
+    jb draw_columns
+
+    inc r10
+    cmp r10, 100
+    jb draw_rows
+
     ret
+
 
 random_number:
     mov eax, [randomState]
@@ -164,6 +205,7 @@ random_number:
     mov eax, [randomState]
     shl eax, 5
     xor [randomState], eax
+
     mov eax, [randomState]
     shr eax, 30
 

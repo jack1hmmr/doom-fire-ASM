@@ -18,14 +18,14 @@ main:
 
     mov r12, rax
 
-    ; Keep window open for now
-    ; run the fire simulation
+fire_loop:
     call fire_update
     call graphics_draw
 
-    ; Keep window open for now
-    mov edi, 100000
+    mov edi, 16
     call SDL_Delay
+
+    jmp fire_loop
 
     ; get rid window
     mov rdi, r12
