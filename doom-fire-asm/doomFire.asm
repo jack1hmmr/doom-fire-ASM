@@ -1,4 +1,5 @@
 global fire_update
+extern pixelBuffer
 
 section .bss
     heat     resb 10000
@@ -64,23 +65,55 @@ fire_update:
     imul eax, 10
     imul edx, 10
 
+    ; save the screen coordinates
+    mov r8d, eax
+    mov r9d, edx
+
     ; get the heat value
-    mov ecx, eax
     movzx eax, byte [heat + 472]
 
     ; get the gradient entry
     imul eax, 3
     lea rsi, [gradient + eax]
 
-    mov rax, 60
-    mov rdi, 0
-    syscall
+    ; calculate pixel-buffer offset
+    imul r8d, 1000
+    add r8d, r9d
+    imul r8d, 3
+    lea r8, [pixelBuffer + r8]
+
+   mov r10, 10
+
+pixel_row:
+    mov r11, 10
+
+pixel_column:
+    mov al, [rsi]
+    mov [r8], al
+
+    mov al, [rsi + 1]
+    mov [r8 + 1], al
+
+    mov al, [rsi + 2]
+    mov [r8 + 2], al
+
+    add r8, 3
+    dec r11
+    jnz pixel_column
+
+    add r8, 2970
+    dec r10
+    jnz pixel_row
+
+    mov rcx, 100
+    mov rdi, heat + 9900
+    mov rdi, heat + 9900
 
 fill_bottom:
     mov byte [rdi], 36
     inc rdi
     loop fill_bottom
-    
+
     mov rcx, 100
     mov rsi, 9900
     mov rdi, 9800
@@ -129,9 +162,7 @@ spread_done:
     dec r9
     jnz outer_loop
     
-    mov rax, 60
-    mov rdi, 0
-    syscall
+    ret
 
 random_number:
     mov eax, [randomState]

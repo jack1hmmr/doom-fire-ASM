@@ -1,6 +1,7 @@
 global main
 
 extern graphics_init
+extern graphics_draw
 extern fire_update
 extern SDL_Delay
 extern SDL_DestroyWindow
@@ -20,6 +21,7 @@ main:
     ; Keep window open for now
     ; run the fire simulation
     call fire_update
+    call graphics_draw
 
     ; Keep window open for now
     mov edi, 100000
