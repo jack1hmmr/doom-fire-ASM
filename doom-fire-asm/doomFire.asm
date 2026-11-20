@@ -55,7 +55,7 @@ gradient_end:
 
 
 section .text
-fire_update:
+global fire_update:
     mov eax, 472
 
     xor edx, edx
