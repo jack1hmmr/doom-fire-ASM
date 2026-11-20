@@ -6,7 +6,7 @@ extern SDL_Init
 extern SDL_CreateWindow
 extern SDL_CreateRGBSurfaceFrom
 extern SDL_GetWindowSurface
-extern SDL_BlitSurface
+extern SDL_UpperBlit
 extern SDL_UpdateWindowSurface
 
 section .bss
@@ -80,7 +80,7 @@ graphics_draw:
     xor esi, esi
     mov rdx, rax
     xor ecx, ecx
-    call SDL_BlitSurface
+    call SDL_UpperBlit
 
     mov rdi, [windowHandle]
     call SDL_UpdateWindowSurface
