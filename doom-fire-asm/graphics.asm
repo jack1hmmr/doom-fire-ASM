@@ -59,9 +59,9 @@ graphics_init:
     mov al, 255
 
 fill_pixels:
-    mov byte [rdi], 255
+    mov byte [rdi], 0
     mov byte [rdi + 1], 0
-    mov byte [rdi + 2], 0
+    mov byte [rdi + 2], 255
     add rdi, 3
     loop fill_pixels
 
