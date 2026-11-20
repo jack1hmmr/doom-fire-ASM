@@ -1,4 +1,4 @@
-global _start
+global fire_update
 
 section .bss
     heat     resb 10000
@@ -54,15 +54,27 @@ gradient_end:
 
 
 section .text
-_start:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, message
-    mov rdx, messageLen
-    syscall
+fire_update:
+    mov eax, 472
 
-    mov rcx, 100
-    mov rdi, heat + 9900
+    xor edx, edx
+    mov ecx, 100
+    div ecx
+
+    imul eax, 10
+    imul edx, 10
+
+    ; get the heat value
+    mov ecx, eax
+    movzx eax, byte [heat + 472]
+
+    ; get the gradient entry
+    imul eax, 3
+    lea rsi, [gradient + eax]
+
+    mov rax, 60
+    mov rdi, 0
+    syscall
 
 fill_bottom:
     mov byte [rdi], 36

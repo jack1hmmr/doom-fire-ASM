@@ -1,6 +1,7 @@
 global main
 
 extern graphics_init
+extern fire_update
 extern SDL_Delay
 extern SDL_DestroyWindow
 extern SDL_Quit
@@ -15,6 +16,10 @@ main:
     call graphics_init
 
     mov r12, rax
+
+    ; Keep window open for now
+    ; run the fire simulation
+    call fire_update
 
     ; Keep window open for now
     mov edi, 100000
