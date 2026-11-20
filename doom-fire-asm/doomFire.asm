@@ -82,6 +82,14 @@ fire_update:
     imul r8d, 3
     lea r8, [pixelBuffer + r8]
 
+    mov al, [rsi]
+    mov [r8], al
+
+    mov al, [rsi + 1]
+    mov [r8 + 1], al
+
+    mov al, [rsi + 2]
+    mov [r8 + 2], al
    
 
     mov rcx, 100
