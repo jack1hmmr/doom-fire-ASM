@@ -165,13 +165,13 @@ draw_block_rows:
 
 draw_block_columns:
     mov al, [rsi]
-    mov [rdx], al
+    mov [rdx + 2], al
 
     mov al, [rsi + 1]
     mov [rdx + 1], al
 
     mov al, [rsi + 2]
-    mov [rdx + 2], al
+    mov [rdx], al
 
     add rdx, 3
     dec r9
