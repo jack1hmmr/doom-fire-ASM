@@ -160,3 +160,5 @@ random_number:
     shr eax, 30
 
     ret
+
+section .note.GNU-stack noalloc noexec nowrite progbits
