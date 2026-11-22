@@ -83,20 +83,45 @@ loop_upwards:
         
         jnc no_underflow   
         xor bl, bl          
-        no_underflow:
-            sub r8, rax
-            mov byte [heat + r8], bl
-            add r8, rax
+        
+no_underflow:
+        
+        mov r11, r8
+        sub r8, rax
 
-            inc r9
-            inc r8
-            cmp r8, r12
-            jne copy_loop
+        mov r10, r12
+        sub r10, 100
+
+        cmp r8, r10
+        jb wrap
+
+
+normal_copy:
+
+        mov byte [heat + r8], bl
+        mov r8, r11
+
+        jmp finish_copy
+
+
+wrap:
+
+        add r8, 100
+        mov byte [heat + r8], bl
+        mov r8, r11
+
+
+finish_copy:
+
+        inc r9
+        inc r8
+        cmp r8, r12
+        jne copy_loop
 
     
     sub r9, 200
     sub r12, 100
-    cmp r8, 100
+    cmp r12, 100
     je done
     sub r8, 200
     jmp loop_upwards
