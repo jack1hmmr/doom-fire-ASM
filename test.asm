@@ -50,7 +50,7 @@ _start:
 
 counters:
 
-    mov r11, 9900
+    mov r12, 9900
     mov r10, 9900
     mov r9, 9900
     mov r8, 9800
@@ -80,18 +80,32 @@ loop_upwards:
         and eax, 3
         
         sub bl, al
-        mov byte [heat + r8], bl
+        
+        jnc no_underflow   
+        xor bl, bl          
+        no_underflow:
+            sub r8, rax
+            mov byte [heat + r8], bl
+            add r8, rax
 
-        inc r9
-        inc r8
-        cmp r8, r11
-        jne copy_loop
+            inc r9
+            inc r8
+            cmp r8, r12
+            jne copy_loop
 
     
     sub r9, 200
-    sub r8, 200
-    sub r11, 100
+    sub r12, 100
     cmp r8, 100
-    jne loop_upwards
+    je done
+    sub r8, 200
+    jmp loop_upwards
+
+done:
+
+    mov eax, 60   
+    xor edi, edi  
+    syscall
+
 
 section .note.GNU-stack noalloc noexec nowrite progbits
