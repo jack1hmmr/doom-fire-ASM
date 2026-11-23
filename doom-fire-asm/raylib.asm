@@ -8,6 +8,7 @@ extern BeginDrawing
 extern EndDrawing
 extern DrawRectangle
 extern CloseWindow
+extern WindowShouldClose
 
 extern heat
 extern gradient
@@ -99,7 +100,7 @@ draw_frame_row:
     ; Next cell horizontally
     add r12d, 10
 
-    ; Have we reached the end of the 1000px row?
+    ; 1000 pixels = 100 cells
     cmp r12d, 1000
     jne draw_frame_row
 
@@ -107,7 +108,7 @@ draw_frame_row:
     xor r12d, r12d
     add r13d, 10
 
-    ; Have we reached the end of the 1000px grid?
+    ; 1000 pixels = 100 rows
     cmp r13d, 1000
     jne draw_frame_row
 
@@ -121,6 +122,7 @@ draw_frame_row:
     pop r12
 
     ret
+
 
 render_shutdown:
 

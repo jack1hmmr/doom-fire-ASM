@@ -4,6 +4,8 @@ global gradient
 
 extern render_init
 extern render_frame
+extern render_shutdown
+extern WindowShouldClose
 
 section .data
 
@@ -48,11 +50,8 @@ gradient:
 
 section .bss
 
-heat:
-    resb 10000
-
-randByte:
-    resb 1
+    heat resb 10000
+    randByte resb 1
 
 section .text
 
@@ -60,8 +59,8 @@ main:
 
     and rsp, -16
 
-    ; Initialize bottom row
-    ; heat[9900..9999] = 32
+
+    ; Initialize bottom row ONCE
 
     mov r10, 9900
 
@@ -74,15 +73,122 @@ loop_start:
     jne loop_start
 
 
-    ; Start renderer
-    ; Simulation temporarily disabled
+    ; Initialize Raylib ONCE
 
     call render_init
 
+
 render_loop:
 
+    ; Check for window close / ESC
+
+    call WindowShouldClose
+    test eax, eax
+    jnz shutdown
+
+
+    ; Reset simulation pointers
+    ; back to the bottom of the fire
+
+    mov r12, 9900
+    mov r9, 9900
+    mov r8, 9800
+
+
+loop_upwards:
+
+    copy_loop:
+
+        movzx ebx, byte [rel heat + r9]
+
+        ; Read one random byte
+
+        mov eax, 318
+        mov rdi, randByte
+        mov esi, 1
+        xor edx, edx
+        syscall
+
+        movzx eax, byte [rel randByte]
+        and eax, 3
+
+        ; Cool the source cell by 0..3
+
+        cmp ebx, eax
+        jb underflow
+
+        sub ebx, eax
+        jmp no_underflow
+
+    underflow:
+
+        xor ebx, ebx
+
+    no_underflow:
+
+        ; Calculate destination
+
+        mov r11, r8
+        sub r8, rax
+
+        mov r10, r12
+        sub r10, 100
+
+        cmp r8, r10
+        jb wrap
+
+
+    normal_copy:
+
+        mov byte [rel heat + r8], bl
+        mov r8, r11
+
+        jmp finish_copy
+
+
+    wrap:
+
+        add r8, 100
+        mov byte [rel heat + r8], bl
+        mov r8, r11
+
+
+    finish_copy:
+
+        inc r9
+        inc r8
+
+        cmp r8, r12
+        jne copy_loop
+
+
+    ; Move one row upward
+
+    sub r9, 200
+    sub r12, 100
+
+    cmp r12, 100
+    je simulation_done
+
+    sub r8, 200
+    jmp loop_upwards
+
+
+simulation_done:
+
+    ; Draw this frame
+
     call render_frame
+
+    ; Run simulation again for next frame
+
     jmp render_loop
+
+
+shutdown:
+
+    call render_shutdown
+    ret
 
 
 section .note.GNU-stack noalloc noexec nowrite progbits
