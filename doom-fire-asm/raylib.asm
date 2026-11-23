@@ -49,12 +49,11 @@ render_frame:
     xor r12d, r12d        ; X = 0
     xor r13d, r13d        ; Y = 0
     xor r14d, r14d        ; heat index = 0
-    xor r15d, r15d        ; row = 0
 
 draw_frame_row:
 
     ; Get heat value
-    movzx eax, byte [heat + r14]
+    movzx eax, byte [rel heat + r14]
 
     ; heat * 3
     imul eax, 3
@@ -94,21 +93,22 @@ draw_frame_row:
 
     call DrawRectangle
 
-    ; Next cell
-    add r12d, 10
+    ; Next heat value
     inc r14d
 
-    ; 100 cells in this row
-    cmp r14d, 100
+    ; Next cell horizontally
+    add r12d, 10
+
+    ; Have we reached the end of the 1000px row?
+    cmp r12d, 1000
     jne draw_frame_row
 
     ; Start next row
     xor r12d, r12d
     add r13d, 10
-    xor r14d, r14d
 
-    inc r15d
-    cmp r15d, 100
+    ; Have we reached the end of the 1000px grid?
+    cmp r13d, 1000
     jne draw_frame_row
 
     call EndDrawing
@@ -121,7 +121,6 @@ draw_frame_row:
     pop r12
 
     ret
-
 
 render_shutdown:
 
