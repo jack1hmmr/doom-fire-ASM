@@ -78,14 +78,14 @@ loop_start:
 
 render_loop:
 
-    ; Check for close / ESC
+    ; Check for close 
 
     call WindowShouldClose
     test eax, eax
     jnz shutdown
 
 
-    ; Reset simulation pointers
+    ; Reset pointers
 
     mov r12, 9900
     mov r9, 9900
