@@ -60,7 +60,7 @@ main:
     and rsp, -16
 
 
-    ; Initialize bottom row ONCE
+    ; Initialize bottom row
 
     mov r10, 9900
 
@@ -73,14 +73,12 @@ loop_start:
     jne loop_start
 
 
-    ; Initialize Raylib ONCE
-
     call render_init
 
 
 render_loop:
 
-    ; Check for window close / ESC
+    ; Check for close / ESC
 
     call WindowShouldClose
     test eax, eax
@@ -88,7 +86,6 @@ render_loop:
 
 
     ; Reset simulation pointers
-    ; back to the bottom of the fire
 
     mov r12, 9900
     mov r9, 9900
@@ -101,7 +98,7 @@ loop_upwards:
 
         movzx ebx, byte [rel heat + r9]
 
-        ; Read one random byte
+        ; Get random byte
 
         mov eax, 318
         mov rdi, randByte
@@ -110,9 +107,9 @@ loop_upwards:
         syscall
 
         movzx eax, byte [rel randByte]
-        and eax, 3
 
-        ; Cool the source cell by 0..3
+        ; Cool by 0 or 1
+        and eax, 1
 
         cmp ebx, eax
         jb underflow
@@ -125,8 +122,6 @@ loop_upwards:
         xor ebx, ebx
 
     no_underflow:
-
-        ; Calculate destination
 
         mov r11, r8
         sub r8, rax
@@ -162,8 +157,6 @@ loop_upwards:
         jne copy_loop
 
 
-    ; Move one row upward
-
     sub r9, 200
     sub r12, 100
 
@@ -176,11 +169,7 @@ loop_upwards:
 
 simulation_done:
 
-    ; Draw this frame
-
     call render_frame
-
-    ; Run simulation again for next frame
 
     jmp render_loop
 
