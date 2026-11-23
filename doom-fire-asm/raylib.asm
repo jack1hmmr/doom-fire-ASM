@@ -32,6 +32,7 @@ render_init:
 
 
 render_frame:
+
     push r12
     push r13
     push r14
@@ -41,7 +42,64 @@ render_frame:
 
     call BeginDrawing
 
-    ; existing renderer code...
+    xor r12d, r12d        ; X = 0
+    xor r13d, r13d        ; Y = 0
+    xor r14d, r14d        ; heat index = 0
+    xor r15d, r15d        ; row = 0
+
+draw_frame_row:
+
+    ; heat[index] -> gradient index
+    movzx eax, byte [heat + r14]
+    imul eax, 3
+
+    ; gradient + (heat * 3)
+    lea r10, [rel gradient]
+    add r10, rax
+
+    ; R
+    movzx eax, byte [r10]
+
+    ; G
+    movzx ecx, byte [r10 + 1]
+    shl ecx, 8
+    or eax, ecx
+
+    ; B
+    movzx ecx, byte [r10 + 2]
+    shl ecx, 16
+    or eax, ecx
+
+    ; A = 255
+    mov ecx, 0xFF
+    shl ecx, 24
+    or eax, ecx
+
+    ; Color -> 5th argument
+    mov r8d, eax
+
+    ; DrawRectangle(x, y, 10, 10, color)
+    mov edi, r12d
+    mov esi, r13d
+    mov edx, 10
+    mov ecx, 10
+
+    call DrawRectangle
+
+    add r12d, 10
+    inc r14d
+
+    cmp r14d, 100
+    jne draw_frame_row
+
+    ; Finished one row
+    xor r12d, r12d
+    add r13d, 10
+    xor r14d, r14d
+
+    inc r15d
+    cmp r15d, 100
+    jne draw_frame_row
 
     call EndDrawing
 
