@@ -47,98 +47,35 @@ gradient:
     db 255,255,255
 
 section .bss
-    heat resb 10000
-    randByte resb 1
+
+heat:
+    resb 10000
+
+randByte:
+    resb 1
 
 section .text
+
 main:
+
     and rsp, -16
 
-counters:
+    ; Initialize bottom row
+    ; heat[9900..9999] = 32
 
-    mov r12, 9900
     mov r10, 9900
-    mov r9, 9900
-    mov r8, 9800
 
 loop_start:
 
-    mov byte [heat + r10], 32
-
+    mov byte [rel heat + r10], 32
 
     inc r10
     cmp r10, 10000
     jne loop_start
 
 
-loop_upwards:
-    copy_loop:
-
-        movzx ebx, byte [rel heat + r9]
-
-        mov eax, 318
-        mov rdi, randByte
-        mov esi, 1
-        xor edx, edx
-        syscall
-
-        movzx eax, byte [rel randByte]
-        and eax, 3
-
-        cmp ebx, eax
-        jb underflow
-
-        sub ebx, eax
-        jmp no_underflow
-
-        underflow:
-            xor ebx, ebx
-
-                
-        
-no_underflow:
-        
-        mov r11, r8
-        sub r8, rax
-
-        mov r10, r12
-        sub r10, 100
-
-        cmp r8, r10
-        jb wrap
-
-
-normal_copy:
-
-        mov byte [heat + r8], bl
-        mov r8, r11
-
-        jmp finish_copy
-
-
-wrap:
-
-        add r8, 100
-        mov byte [heat + r8], bl
-        mov r8, r11
-
-
-finish_copy:
-
-        inc r9
-        inc r8
-        cmp r8, r12
-        jne copy_loop
-
-    
-    sub r9, 200
-    sub r12, 100
-    cmp r12, 100
-    je done
-    sub r8, 200
-    jmp loop_upwards
-
-done:
+    ; Start renderer
+    ; Simulation temporarily disabled
 
     call render_init
 
