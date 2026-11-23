@@ -74,21 +74,27 @@ loop_start:
 loop_upwards:
     copy_loop:
 
-        mov bl, [heat + r9]
+        movzx ebx, byte [rel heat + r9]
 
-        mov eax, 318          
-        mov rdi, randByte   
-        mov esi, 1            
-        xor edx, edx          
+        mov eax, 318
+        mov rdi, randByte
+        mov esi, 1
+        xor edx, edx
         syscall
 
-        movzx eax, byte [randByte]
+        movzx eax, byte [rel randByte]
         and eax, 3
-        
-        sub bl, al
-        
-        jnc no_underflow   
-        xor bl, bl          
+
+        cmp ebx, eax
+        jb underflow
+
+        sub ebx, eax
+        jmp no_underflow
+
+        underflow:
+            xor ebx, ebx
+
+                
         
 no_underflow:
         
