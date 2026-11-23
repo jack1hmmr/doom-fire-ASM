@@ -20,12 +20,16 @@ title:
 section .text
 
 render_init:
+
     sub rsp, 8
 
     mov edi, 1000
     mov esi, 1000
     lea rdx, [rel title]
     call InitWindow
+
+    mov edi, 60
+    call SetTargetFPS
 
     add rsp, 8
     ret
@@ -49,8 +53,38 @@ render_frame:
 
 draw_frame_row:
 
-    ; heat[index] -> gradient index
-    mov r8d, 0xFF0000FF
+    ; Get heat value
+    movzx eax, byte [heat + r14]
+
+    ; heat * 3
+    imul eax, 3
+
+    ; Get gradient address
+    lea r10, [rel gradient]
+    add r10, rax
+
+    ; Build RGBA color
+
+    ; R
+    movzx eax, byte [r10]
+
+    ; G
+    movzx ecx, byte [r10 + 1]
+    shl ecx, 8
+    or eax, ecx
+
+    ; B
+    movzx ecx, byte [r10 + 2]
+    shl ecx, 16
+    or eax, ecx
+
+    ; A = 255
+    mov ecx, 255
+    shl ecx, 24
+    or eax, ecx
+
+    ; Color -> R8D
+    mov r8d, eax
 
     ; DrawRectangle(x, y, 10, 10, color)
     mov edi, r12d
@@ -60,13 +94,15 @@ draw_frame_row:
 
     call DrawRectangle
 
+    ; Next cell
     add r12d, 10
     inc r14d
 
+    ; 100 cells in this row
     cmp r14d, 100
     jne draw_frame_row
 
-    ; Finished one row
+    ; Start next row
     xor r12d, r12d
     add r13d, 10
     xor r14d, r14d
@@ -90,5 +126,7 @@ draw_frame_row:
 render_shutdown:
 
     call CloseWindow
-
     ret
+
+
+section .note.GNU-stack noalloc noexec nowrite progbits
