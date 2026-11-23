@@ -50,33 +50,7 @@ render_frame:
 draw_frame_row:
 
     ; heat[index] -> gradient index
-    movzx eax, byte [heat + r14]
-    imul eax, 3
-
-    ; gradient + (heat * 3)
-    lea r10, [rel gradient]
-    add r10, rax
-
-    ; R
-    movzx eax, byte [r10]
-
-    ; G
-    movzx ecx, byte [r10 + 1]
-    shl ecx, 8
-    or eax, ecx
-
-    ; B
-    movzx ecx, byte [r10 + 2]
-    shl ecx, 16
-    or eax, ecx
-
-    ; A = 255
-    mov ecx, 0xFF
-    shl ecx, 24
-    or eax, ecx
-
-    ; Color -> 5th argument
-    mov r8d, eax
+    mov r8d, 0xFF0000FF
 
     ; DrawRectangle(x, y, 10, 10, color)
     mov edi, r12d
